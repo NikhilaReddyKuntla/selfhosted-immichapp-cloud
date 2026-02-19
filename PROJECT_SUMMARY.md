@@ -1,9 +1,5 @@
 # Project Summary: Production-Grade Self-Hosted Immich Deployment
 
-## One-Line Project Title
-
-**Production-Grade Self-Hosted Immich Deployment on Hetzner Cloud**
-
 ## Project Overview
 
 I deployed and configured a production-ready, self-hosted Immich photo and video management platform on Hetzner Cloud infrastructure using Docker Compose orchestration. I designed a multi-container architecture with persistent storage for large media libraries, integrated PostgreSQL with vector search extensions for AI-powered photo recognition, and configured host-level nginx reverse proxy for secure HTTPS remote access. The deployment emphasizes data integrity, high availability through automated restart policies, and environment-driven configuration management for portability and security.
@@ -54,4 +50,3 @@ Production-grade self-hosted Immich deployment on Hetzner Cloud with Docker Comp
 
 ---
 
-*This document is optimized for resume, LinkedIn, and portfolio use. Technical details are based on actual deployment configuration.*
