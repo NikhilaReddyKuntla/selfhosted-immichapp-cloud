@@ -1,0 +1,75 @@
+# Immich Docker Compose Configuration
+# Production-grade self-hosted Immich deployment
+# 
+# IMPORTANT: Before running, copy .env.example to .env and configure your settings
+# Documentation: https://immich.app/docs/install/docker-compose
+# Latest release: https://github.com/immich-app/immich/releases
+
+name: immich
+
+services:
+  immich-server:
+    container_name: immich_server
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    # Uncomment the following section for hardware-accelerated transcoding
+    # extends:
+    #   file: hwaccel.transcoding.yml
+    #   service: cpu  # Options: [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl]
+    volumes:
+      # IMPORTANT: Edit UPLOAD_LOCATION in .env file, not here
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - .env
+    ports:
+      - '2283:2283'
+    depends_on:
+      - redis
+      - database
+    restart: always
+    healthcheck:
+      disable: false
+
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    # Uncomment the following section for hardware-accelerated ML inference
+    # extends:
+    #   file: hwaccel.ml.yml
+    #   service: cpu  # Options: [armnn, cuda, rocm, openvino, openvino-wsl, rknn]
+    # 
+    # Alternatively, modify the image tag to include hardware acceleration:
+    # image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}-cuda
+    # See documentation: https://immich.app/docs/guides/hardware-transcoding
+    volumes:
+      - model-cache:/cache
+    env_file:
+      - .env
+    restart: always
+    healthcheck:
+      disable: false
+
+  redis:
+    container_name: immich_redis
+    image: docker.io/valkey/valkey:8-bookworm@sha256:fec42f399876eb6faf9e008570597741c87ff7662a54185593e74b09ce83d177
+    healthcheck:
+      test: redis-cli ping || exit 1
+    restart: always
+
+  database:
+    container_name: immich_postgres
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_DATABASE_NAME}
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+      # Uncomment and set to 'HDD' if using HDD storage (not recommended for production)
+      # DB_STORAGE_TYPE: 'HDD'
+    volumes:
+      # IMPORTANT: Edit DB_DATA_LOCATION in .env file, not here
+      - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  model-cache:

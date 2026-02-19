@@ -1,0 +1,35 @@
+# Environment variables - NEVER commit sensitive data
+.env
+.env.local
+.env.*.local
+
+# Docker Compose override files
+docker-compose.override.yml
+docker-compose.*.yml
+
+# Logs
+*.log
+logs/
+
+# Backup files
+*.sql
+*.sql.gz
+backup/
+backups/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.code-workspace
+
+# Temporary files
+tmp/
+temp/
+*.tmp
